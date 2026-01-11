@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="./logo.png" type="image/x-icon">
+    <title>武冈十中墙 | 搜索账号</title>
+    <style>
+        /* 重置默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .back-btn {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* 高级搜索框高级样式 */
+        .search-container {
+            max-width: 1200px;
+            margin: 16px auto 0;
+            padding: 0 16px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto; /* 居中显示 */
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px; /* 左侧留空间放图标 */
+            border: 2px solid #e0e0e0;
+            border-radius: 30px; /* 圆角更圆润 */
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        /* 搜索图标样式 */
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        /* 清除按钮样式 */
+        .clear-btn {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 聚焦状态效果 */
+        .search-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px); /* 轻微上浮 */
+        }
+
+        .search-input:focus + .search-icon {
+            color: #3498db;
+            transform: translateY(-50%) scale(1.1); /* 图标变色并放大 */
+        }
+
+        /* 悬浮状态效果 */
+        .search-wrapper:hover .search-input:not(:focus) {
+            border-color: #b0c4de;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 输入内容时的动画 */
+        .search-input:not(:placeholder-shown) {
+            border-color: #d0e1f9;
+        }
+
+        /* 名片容器样式 */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            max-width: 1200px;
+            margin: 16px auto;
+            padding: 0 16px;
+            flex: 1;
+        }
+
+        /* 名片核心样式 - 调整为横向布局 */
+        .user-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            transition: transform 0.3s ease;
+            display: flex; /* 使用flex布局 */
+            align-items: center; /* 垂直居中对齐 */
+            gap: 16px; /* 头像和信息区域的间距 */
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 头像样式 - 固定在左侧 */
+        .portrait-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #eee;
+            flex-shrink: 0; /* 防止头像在空间不足时被压缩 */
+        }
+
+        .portrait-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .portrait-img[src=""] {
+            background-color: #e0e0e0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* 用户信息样式 - 位于头像右侧 */
+        .user-info {
+            flex-grow: 1; /* 占据剩余所有空间 */
+            text-align: left; /* 文字左对齐 */
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .user-detail {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        /* 加载/错误/无结果提示 */
+        .status提示 {
+            text-align: center;
+            font-size: 15px;
+            color: #666;
+            padding: 40px 0;
+            width: 100%;
+            grid-column: 1 / -1; /* 确保提示信息横跨所有列 */
+        }
+
+        /* 页脚样式 */
+        .footer {
+            background-color: #fff;
+            padding: 16px;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+            margin-top: auto;
+        }
+
+        /* 媒体查询：小屏手机 */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 12px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            .search-input {
+                padding: 12px 18px 12px 45px;
+                font-size: 14px;
+            }
+
+            .search-icon {
+                width: 18px;
+                height: 18px;
+                left: 16px;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr; /* 手机上每行只显示一张卡片 */
+            }
+
+            .user-card {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .portrait-wrapper {
+                width: 50px;
+                height: 50px;
+            }
+
+            .user-name {
+                font-size: 16px;
+            }
+
+            .user-detail {
+                font-size: 12px;
+            }
+        }
+
+        /* 媒体查询：大屏PC */
+        @media (min-width: 1200px) {
+            .search-container, .card-container {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="./logo.png" alt="logo" style="height:24px; vertical-align: middle; margin-right:8px;">
+        </div>
+        <button class="back-btn" id="backBtn">
+            返回
+        </button>
+    </nav>
+
+    <!-- 搜索框区域（带高级样式） -->
+    <div class="search-container">
+        <div class="search-wrapper">
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input"
+                placeholder="搜索ID/昵称（支持模糊匹配）..."
+            >
+            <!-- 搜索图标 -->
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <!-- 清除按钮 -->
+            <button class="clear-btn" id="clearBtn">×</button>
+        </div>
+    </div>
+
+    <!-- 名片容器 -->
+    <div class="card-container" id="cardContainer">
+        <!-- 加载提示 -->
+        <div class="status提示" id="status提示">正在加载用户数据...</div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+       武冈十中墙 &copy; 2026 
+    </footer>
+
+    <script>
+        // 获取DOM元素
+        const cardContainer = document.getElementById('cardContainer');
+        const status提示 = document.getElementById('status提示');
+        const backBtn = document.getElementById('backBtn');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        // 保存原始用户列表，用于搜索过滤
+        let originalUserList = [];
+
+        // 返回按钮点击事件
+        backBtn.addEventListener('click', () => {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                alert('暂无上一页可返回');
+            }
+        });
+
+        // 清除按钮点击事件
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.classList.remove('visible');
+            searchCards('');
+            // 触发输入框动画重置
+            searchInput.focus();
+            setTimeout(() => searchInput.blur(), 100);
+        });
+
+        // 监听搜索框输入，控制清除按钮显示/隐藏
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            if (value) {
+                clearBtn.classList.add('visible');
+            } else {
+                clearBtn.classList.remove('visible');
+            }
+            searchCards(value);
+        });
+
+        /**
+         * 渲染名片列表
+         * @param {Array} userList - 要渲染的用户列表
+         */
+        function renderCards(userList) {
+            // 清空容器
+            cardContainer.innerHTML = '';
+
+            // 无匹配数据时显示提示
+            if (!Array.isArray(userList) || userList.length === 0) {
+                cardContainer.innerHTML = '<div class="status提示">未找到匹配的用户数据</div>';
+                return;
+            }
+
+            // 循环渲染每个用户的名片
+            userList.forEach(user => {
+                const { pname, id, gender, portrait } = user;
+
+                const card = document.createElement('div');
+                card.className = 'user-card';
+
+                card.innerHTML = `
+                    <div class="portrait-wrapper">
+                        <img class="portrait-img" src="${portrait || ''}" alt="${pname || '用户头像'}">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">${pname || '未知用户名'}</div>
+                        <div class="user-detail">ID：${id || '未知ID'}</div>
+                        <div class="user-detail">性别：${gender || '未知性别'}</div>
+                    </div>
+                `;
+
+                cardContainer.appendChild(card);
+            });
+        }
+
+        /**
+         * 搜索过滤函数
+         * @param {String} keyword - 搜索关键词
+         */
+        function searchCards(keyword) {
+            // 无关键词时显示全部
+            if (!keyword.trim()) {
+                renderCards(originalUserList);
+                return;
+            }
+
+            // 不区分大小写模糊匹配ID或昵称
+            const lowerKeyword = keyword.toLowerCase().trim();
+            const filteredList = originalUserList.filter(user => {
+                const pname = (user.pname || '').toLowerCase();
+                const id = (user.id || '').toLowerCase();
+                return pname.includes(lowerKeyword) || id.includes(lowerKeyword);
+            });
+
+            renderCards(filteredList);
+        }
+
+        // 读取并渲染JSON数据
+        async function loadUserData() {
+            try {
+                const response = await fetch('./root.json');
+                
+                if (!response.ok) {
+                    throw new Error(`请求失败：${response.status} ${response.statusText}`);
+                }
+
+                originalUserList = await response.json();
+                
+                // 初始渲染全部数据
+                renderCards(originalUserList);
+
+            } catch (error) {
+                // 显示加载错误
+                cardContainer.innerHTML = `<div class="status提示" style="color: #e53935;">加载失败：${error.message}</div>`;
+                console.error('加载用户数据出错：', error);
+            }
+        }
+
+        // 页面加载完成后执行
+        window.addEventListener('DOMContentLoaded', loadUserData);
+    </script>
+</body>
+</html>
